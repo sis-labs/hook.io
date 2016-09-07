@@ -14,7 +14,7 @@ var mustache = require('mustache');
 var mergeParams = require('merge-params');
 var bodyParser = require('body-parser');
 var themes = require('../lib/resources/themes');
-var server = require('../lib/server');
+var web = require('../lib/web');
 var languages = require('../lib/resources/programmingLanguage').languages;
 var checkRoleAccess = require('../lib/server/routeHandlers/checkRoleAccess');
 var config = require('../config');
@@ -38,6 +38,8 @@ module['exports'] = function view (opts, callback) {
     return res.redirect('/login');
   }
   */
+
+  $ = req.white($);
 
   bodyParser()(req, res, function bodyParsed(){
     mergeParams(req, res, function(){});
@@ -92,7 +94,7 @@ module['exports'] = function view (opts, callback) {
           return res.end(err.message);
         }
         if (result.length === 0) {
-          return server.handle404(req, res);
+          return web.handle404(req, res);
         }
         req.hook = result[0];
           billing.find({ owner: req.session.user }, function (err, results) {
@@ -227,6 +229,14 @@ module['exports'] = function view (opts, callback) {
 
       for (var s in services) {
         $('.services').append(services[s]);
+      }
+
+      if (params.status === "forked") {
+        $('.message').html('Hook Forked!')
+      }
+
+      if (params.status === "refreshed") {
+        $('.message').html('Refreshed any cached sources.')
       }
 
       if (params.status === "created") {

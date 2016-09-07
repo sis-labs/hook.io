@@ -4,11 +4,13 @@
   }
 </style>
 
-<div class="splash" align="left">
+<div>
   <h1>Domains</h1>
+
+<div class="splash container" align="left">
   <p>Custom domains are a great way to brand the appearance of a service with it's own unique domain name.</p>
   
-  <h2>{{appName}} subdomains</h2>
+  <h2>{{appName}} Subdomains</h2>
   <p>
     Subdomains at <code>*.{{appName}}</code> are available on a first come first serve basis.</p><p> To associate a subdomain with a Hook, simply add the subdomain entry in the form below ( login required ).
   </p>
@@ -19,7 +21,7 @@
   </p>
 
   <hr/>
-  <h2>custom domains</h2>
+  <h2>Custom Domains</h2>
 
   <p>To add a Custom Domain, you will need to associate the domain's <code>A record</code> to <code>104.131.118.1</code> ( which is the ip address of {{appName}} ).</p>
 
@@ -37,7 +39,7 @@
   <div class="row loginBar">
     <br/>
     <div class="col-md-12" align="center">
-      <a href="/login" class="btn btn-social btn-github" style="padding: 14px 24px;font-size: 21px;"><i class="fa fa-github"></i><span style="padding-left:60px"> Sign in with Github</span></a>
+      <a href="{{appUrl}}/login" class="btn btn-social btn-github" style="padding: 14px 24px;font-size: 21px;"><i class="fa fa-github"></i><span style="padding-left:60px"> Sign in with Github</span></a>
     </div>
     <br/>
     <br/>
@@ -47,9 +49,9 @@
     
   </div>
   <br/>
-  
+  <div class="domains"></div>
+  <br/>
+  <br/>
 </div>
 
-<div class="domains"></div>
-<br/>
-<br/>
+</div>

@@ -1,17 +1,7 @@
 var user = require('../lib/resources/user');
 var passport = require('passport');
 
-// TODO: make parseRequest into separate module
-// maybe put into https://github.com/bigcompany/parse-service-request/ ?
-var parseRequest = function parse (req, res, cb) {
-  var mergeParams = require('merge-params'),
-      bodyParser = require('body-parser');
-  bodyParser()(req, res, function bodyParsed () {
-    mergeParams(req, res, function(){});
-    params = req.resource.params;
-    cb(null, params);
-  });
-};
+var psr = require('parse-service-request');
 
 module['exports'] = function view (opts, callback) {
 
@@ -20,7 +10,10 @@ module['exports'] = function view (opts, callback) {
   var req = opts.request,
       res = opts.response;
 
-  parseRequest(req, res, function(err, params) {
+  $ = req.white($);
+
+  psr(req, res, function(req, res) {
+    var params = req.resource.params;
     if (params.name && params.password) {
       params.name = params.name.toLowerCase();
       var type = "name";
@@ -36,18 +29,22 @@ module['exports'] = function view (opts, callback) {
         }
         if (results.length === 0) {
           req.session.user = params.name;
-          return res.end('available');
+          var r = {
+            result: "available",
+          };
+          return res.json(r);
         }
         var u = results[0];
         var crypto = require('crypto');
         var hash = crypto.createHmac("sha512", u.salt).update(params.password).digest("hex");
         if (hash !== u.password) {
           var r = {
-            res: "invalid",
+            result: "invalid",
           };
           if (u.githubOauth === true) {
-            r.res = "redirect";
+            r.result = "redirect";
             r.redirect = "/login/github";
+            return res.redirect(r.redirect);
             // if the user has already oauthed with github before,
             // and is attempting to sign in with a bad password,
             // lets just redirect them to the github auth! easy.
@@ -60,17 +57,25 @@ module['exports'] = function view (opts, callback) {
           }
           req.session.user = u.name.toLowerCase();
           req.session.paidStatus = u.paidStatus;
+          req.session.email = u.email;
           var r = {
-            res: "valid",
+            result: "valid",
           };
-          // r.res = "redirect";
-          r.redirect = req.session.redirectTo || "/";
-          return res.end(JSON.stringify(r));
+          user.emit('login', u);
+          r.redirect = req.session.redirectTo || "/services";
+          if (req.jsonResponse) {
+            return res.json(r);
+          } else {
+            return res.redirect(r.redirect);
+          }
         });
       });
     } else {
-      res.redirect('/');
-      // callback(null, $.html());
+      if (req.jsonResponse) {
+        return res.json({ status: 'invalid', message: 'name and email required'});
+      } else {
+        return callback(null, $.html());
+      }
     }
   });
 

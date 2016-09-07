@@ -15,6 +15,8 @@ module['exports'] = function view (opts, callback) {
   var $ = this.$;
   var req = opts.request, res = opts.response;
 
+  $ = req.white($);
+
   $('#addPaymentMethod').attr('data-key', config.stripe.publicKey);
 
   bodyParser()(req, res, function bodyParsed(){
@@ -208,7 +210,7 @@ module['exports'] = function view (opts, callback) {
       // not adding new billing data, just show existing
       if (!req.isAuthenticated()) {
         req.session.redirectTo = "/billing";
-        return res.redirect('/');
+        return res.redirect('/login');
       }
       billing.find({ owner: req.session.user }, function (err, results) {
         if (err) {
@@ -223,10 +225,7 @@ module['exports'] = function view (opts, callback) {
         } else {
           // TODO: add copy on billing page for pricing options
           // $('.billingForm').html('<h3>No Billing Options Found!</h3>' + checkOut);
-          var appName = req.hostname;
-          var out = $.html();
-          out = out.replace(/\{\{appName\}\}/g, appName);
-          callback(null, out);
+          callback(null, $.html());
         }
       });
       // callback(null, $.html());

@@ -18,12 +18,14 @@ module['exports'] = function view (opts, callback) {
 
   var $ = this.$;
   var req = opts.request, res = opts.response;
+  $ = req.white($);
 
   // if not logged in, kick out
   if (!req.isAuthenticated()) { 
     req.session.redirectTo = "/account";
     // TODO: actual login screen, not just homepage login
-    return res.redirect('/');
+    //return callback(null, $.html());
+    return res.redirect('/login');
   }
 
   // TODO: refactor out most of this block using Resource.User.before() hooks
@@ -120,7 +122,7 @@ module['exports'] = function view (opts, callback) {
           if (typeof params.password !== 'undefined' && typeof params.confirmPassword !== 'undefined') {
             if (params.password.length > 0) {
               if (params.password !== params.confirmPassword) {
-                return res.end('passwords do not match!');
+                return res.end('Passwords do not match. Please go back and try again.');
               }
               _user.password = params.password;
             }
@@ -146,6 +148,7 @@ module['exports'] = function view (opts, callback) {
               if (err) {
                 return res.end(err.message);
               }
+              req.session.email = result.email;
               // display user info in account form
               // TODO: if form post data, attempt to update user account information
               showUserForm(_user, function(err, result){
@@ -188,20 +191,16 @@ function showUserForm (user, cb) {
     disabled: true
   };
 
-  formSchema.previousName = {
-    default: user.name,
-    format: "hidden"
-  };
-
   formSchema.email.default = user.email || "";
   // formSchema.email.disabled = true;
 
+  /*
   formSchema.run = {
     "type": "string",
     "default": "true",
     "format": "hidden"
   };
-
+  */
   formSchema.paidStatus = {
     "type": "string",
     "label": "account paid status",
@@ -216,6 +215,11 @@ function showUserForm (user, cb) {
   formSchema.confirmPassword = {
     "type": "string",
     "format": "password"
+  };
+
+  formSchema.previousName = {
+    default: user.name,
+    format: "hidden"
   };
 
   /*

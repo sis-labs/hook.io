@@ -1,0 +1,99 @@
+<style>
+  .hooks {
+    font-size: 1.5em;
+    text-align: left;
+  }
+  .userBar {
+    font-size: 28px;
+    padding-bottom: 40px;
+    text-align: left;
+  }
+  
+  .userBar table {
+    width: 100%;
+    text-align: center;
+    font-size: 22px;
+    border: none;
+  }
+
+  .manageEnv {
+    font-size: 28px;
+  }
+  .referrals {
+    font-size: 28px;
+  }
+  .noHooks {
+    font-size:22px;
+  }
+  .navBar {
+    margin-bottom:0px;
+  }
+  .megaRow .mega-octicon {
+    font-size: 64px;
+    height: 64px;
+    width: 64px;
+  }
+  .megaRow a {
+    text-align: center;
+  }
+
+</style>
+
+<script type="text/javascript">
+  $(document).ready(function(){
+    $('.deleteLink').on('click', function(){
+      var name = $(this).attr('data-name');
+      var result = confirm('Are you certain you want to destroy:\n\n' + name);
+      if (result) {
+        return true;
+      } else {
+        return false;
+      }
+    });
+  });
+</script>
+
+<br/>
+<div class="blog-area">
+
+  <div class="container">
+
+  <div class="navBar">
+    <p class="hint">Hint: You can quickly jump to platform features by name using the search bar at the top of the page. For example: domains</p>
+    <div class="userBar">
+      <table>
+        <tr class="megaRow" valign="center">
+          <td align="left">
+          <a href="{{appUrl}}/new" title="Create New Hook"><span class="mega-octicon octicon-plus"></span></a>
+          <a href="{{appUrl}}/env" title="Manage Enviroment Variables"><span class="mega-octicon octicon-settings"></span></a>
+          <a href="{{appUrl}}/logs" title="Logs"><span class="mega-octicon octicon-list-ordered"></span></a>
+
+          <a href="{{appUrl}}/datastore" title="Datastore"><span class="mega-octicon octicon-database"></span></a>
+
+          <a href="{{appUrl}}/files" title="Files"><span class="mega-octicon octicon-file-directory"></span></a>
+
+          <a href="{{appUrl}}/keys" title="Keys"><span class="mega-octicon octicon-key"></span></a>
+          <a href="{{appUrl}}/domains" title="Manage Domains and Subdomains"><span class="mega-octicon octicon-globe"></span></a>
+          <!--
+          &nbsp;&nbsp;&nbsp;
+          <a href="{{appUrl}}/referrals" title="Manage Affilates / Referrals"><span class="mega-octicon octicon-broadcast"></span></a>
+          -->
+
+          <a href="{{appUrl}}/events" title="Events"><span class="mega-octicon octicon-pulse"></span></a>
+
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <div class="noHooks">
+    <h2>It looks like you haven't created any Services yet!</h2>
+    <p>You can Create a new Service by clicking <a href="{{appUrl}}/new" title="Create New Hook"><span class="mega-octicon octicon-plus"></span></a></p>
+  </div>
+  <table class="hooks table">
+  </table>
+</div>
+</div>
+<br/>
+<br/>
+<br/>

@@ -26,21 +26,26 @@ module['exports'] = function (opts, callback) {
 
     Object.keys(grouped).forEach(function(key){
       // group headers per language
-      $('.examples').append('<h3>' + key + '</h3>')
+      $('.examples').append('<a name="' + key + '"></a>');
+      $('.examples').append('<h3>' + key + '</h3>');
+
+      // update side menu
+      $('.langMenu').append('<li><a href="#' + key + '">' + key + '</a> </li>');
+
       grouped[key].forEach(function(h){
         // TODO: add description of hook with h.description ( data is missing for most examples )
-        $('.examples').append('<a href="/marak/' + h.name + '">' + h.name + '</a><br/>')
+        var serviceLink = '{{appUrl}}/marak/' + h.name + '';
+        $('.examples').append('<a href="' + serviceLink + '/source"><span title="View Source" class="forkBtn octicon octicon-file-code"></span></a>&nbsp;<a href="' + serviceLink + '/fork"><span title="Fork Service" class="forkBtn octicon octicon-repo-forked"></span></a> <a href="' + serviceLink + '">' + h.name + '</a><br/>')
       });
       $('.examples').append('<br/>');
       // group by language type
       // if (h.name.search(/examples-/) !== -1) {
-        // $('.examples').append('<a href="/marak/' + h.name + '">' + h.name + '</a><br/>')
+        // $('.examples').append('<a href="{{appUrl}}/marak/' + h.name + '">' + h.name + '</a><br/>')
       // }
     });
 
-    var out = $.html();
-    out = out.replace(/\{\{appName\}\}/g, appName);
-    callback(null, out);
+    $ = req.white($);
+    return callback(null, $.html());
 
   });
 

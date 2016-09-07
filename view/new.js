@@ -28,7 +28,7 @@ module['exports'] = function view (opts, callback) {
     // TODO: move to resource.before hooks...maybe not. better to avoid the pre-processing logic...
     checkRoleAccess({ req: req, res: res, role: "hook::create" }, function (err, hasPermission) {
 
-      if (!hasPermission || req.resource.owner === "anonymous") { // don't allow anonymous hook creation
+      if (!hasPermission /* || req.resource.owner === "anonymous" */ ) { // don't allow anonymous hook creation
         if (req.jsonResponse !== true && typeof params.hook_private_key === "undefined") {
           req.session.redirectTo = "/new";
           return res.redirect('/login');
@@ -58,15 +58,15 @@ module['exports'] = function view (opts, callback) {
   });
 
   function finish () {
-    $('title').html(appName + ' - Create new Hook');
+    $('title').html(appName + ' - Create new Service');
 
       var gist = params.gist;
 
-      if (req.method === "POST") {
+      if (req.method === "POST" && typeof params.scaffold === "undefined") {
 
         if (typeof params.name === 'undefined' || params.name.length === 0) {
-          
-          var msg = 'Hook name is required!';
+
+          var msg = 'Service name is required!';
           if (req.jsonResponse === true) {
             msg = {
               error: true,
@@ -111,9 +111,7 @@ module['exports'] = function view (opts, callback) {
 
         var query = { name: params.name, owner: req.resource.owner };
         //var query = { name: params.name, owner: req.session.user };
-        console.log('trying to find', query)
-        return hook.find(query, function(err, results){
-          console.log('FFFOUND', results)
+        return hook.find(query, function (err, results) {
           if (results.length > 0) {
             var h = results[0];
             var msg = 'Hook already exists ' + '/' + h.owner + "/" + h.name;
@@ -130,6 +128,7 @@ module['exports'] = function view (opts, callback) {
             //return res.redirect('/' + h.owner + "/" + h.name + "?alreadyExists=true");
           }
           params.cron = params.cronString;
+
           if (params.hookSource === "code") {
             delete params.gist;
             params.source = params.source || params.codeEditor;
@@ -207,6 +206,20 @@ module['exports'] = function view (opts, callback) {
         $('.securityHolder input').attr('disabled', 'DISABLED')
       }
 
+      if (typeof req.session.tempSource !== "undefined") {
+        $('.codeEditor').html(req.session.tempSource);
+        // keep or destroy? maybe present option as clipboard in session?
+        // better to keep delete for now...is causing issue with examples
+        delete req.session.tempSource;
+      }
+
+      if (typeof req.session.tempLang === "string") {
+        // TODO: better default databinding ( instead of prepend ) in boot
+        $('#language').prepend('<option value="' + req.session.tempLang +'">' + req.session.tempLang + '</option>');
+        $('#gatewayForm').attr('action', config.app.url + '/marak/gateway-' + req.session.tempLang);
+        delete req.session.tempLang;
+      }
+
       var services = hooks.services;
       var examples = {};
 
@@ -241,9 +254,9 @@ module['exports'] = function view (opts, callback) {
       self.parent.components.themeSelector.present({ request: req, response: res }, function(err, html){
         var el = $('.themeSelector')
         el.html(html);
+        $ = req.white($);
         var out = $.html();
         out = out.replace('{{hook}}', JSON.stringify(boot, true, 2));
-        out = out.replace(/\{\{appName\}\}/g, appName);
         callback(null, out);
       });
 

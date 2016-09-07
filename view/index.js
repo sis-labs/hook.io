@@ -21,7 +21,6 @@ var address = {
 module['exports'] = function view (opts, callback) {
 
   var userResource = require('../lib/resources/user');
-  var domain = require('../lib/resources/domain');
 
   var $ = this.$,
       req = opts.request,
@@ -31,7 +30,7 @@ module['exports'] = function view (opts, callback) {
 
   var boot = {};
 
-  boot.baseUrl = config.baseUrl;
+  boot.baseUrl = config.app.url;
   var i = req.i18n;
 
   boot.messages = {
@@ -75,8 +74,12 @@ module['exports'] = function view (opts, callback) {
 
   // Render a cURL friendly response
   if (req.headers.accept === "*/*") {
+    var address = "";
+    if (typeof req.connection !== "undefined" && typeof req.connection.remoteAddress !== "undefined") {
+      address = req.connection.remoteAddress.toString();
+    }
     // TODO: move curl welcome screen to new module
-    var message = "Greetings " + req.connection.remoteAddress.toString() + '\n';
+    var message = "Greetings " + address + '\n';
     message += "Thank you for cURLing hook.io! \n\n"
     message += "We understand that not everyone is super thrilled to use a 'web-browser',\n";
     message += "so we also provide terminal services for accessing our hosting platform.\n\n";
@@ -109,7 +112,7 @@ module['exports'] = function view (opts, callback) {
     return res.end(message);
   }
   // TODO: gateway.hook.io for production
-  $('#gatewayForm').attr('action', config.baseUrl + '/Marak/gateway-javascript');
+  $('#gatewayForm').attr('action', config.app.url + '/Marak/gateway-javascript');
 
 
   var services = hooks.services;
@@ -189,11 +192,6 @@ module['exports'] = function view (opts, callback) {
         // do nothing
       }
       var u = results[0];
-      if(typeof u.email === "undefined" || u.email.length === 0) {
-        // do not remove emailReminder
-      } else {
-        $('.emailReminder').remove();
-      }
       $('.userBar .welcome').html(i.__('Welcome') + ' <strong>' + user + "</strong>!")
       $('.loginBar').remove();
       $('.featuresDiv').remove();
